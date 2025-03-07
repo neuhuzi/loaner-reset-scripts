@@ -9,6 +9,8 @@ echo " 1. Clear Downloads, Documents, and Desktop folders"
 echo " 2. Clear browser data (Chrome, Safari, Firefox)"
 echo " 3. Sign out of Microsoft 365 applications"
 echo " 4. Remove saved credentials"
+echo " 5. Remove Chrome profiles"
+echo " 6. Sign out of Adobe applications"
 echo
 echo "Press Ctrl+C to cancel or Enter to continue..."
 read -r
@@ -39,10 +41,8 @@ echo "[*] Clearing browser data..."
 echo "  - Clearing Google Chrome data..."
 killall "Google Chrome" 2>/dev/null
 if [ -d "$HOME/Library/Application Support/Google/Chrome" ]; then
-    rm -rf "$HOME/Library/Application Support/Google/Chrome/Default/Cache"* >> "$LOGFILE" 2>&1
-    rm -rf "$HOME/Library/Application Support/Google/Chrome/Default/Cookies"* >> "$LOGFILE" 2>&1
-    rm -rf "$HOME/Library/Application Support/Google/Chrome/Default/History"* >> "$LOGFILE" 2>&1
-    rm -rf "$HOME/Library/Application Support/Google/Chrome/Default/Login Data"* >> "$LOGFILE" 2>&1
+    echo "    Removing Chrome profiles and data..."
+    rm -rf "$HOME/Library/Application Support/Google/Chrome"/* >> "$LOGFILE" 2>&1
     echo "    Done."
 else
     echo "    Chrome not installed, skipping."
@@ -132,6 +132,28 @@ if [ -d "$HOME/Library/Application Support/Microsoft/Teams" ]; then
     echo "    Done."
 else
     echo "    Teams not installed, skipping."
+fi
+
+echo
+echo "[*] Signing out of Adobe applications..."
+# Kill Adobe applications
+killall "Adobe Creative Cloud" 2>/dev/null
+killall "Adobe Photoshop" 2>/dev/null
+killall "Adobe Illustrator" 2>/dev/null
+killall "Adobe InDesign" 2>/dev/null
+killall "Adobe Acrobat" 2>/dev/null
+
+# Clear Adobe application data
+echo "  - Removing Adobe credentials and cache..."
+if [ -d "$HOME/Library/Application Support/Adobe" ]; then
+    rm -rf "$HOME/Library/Application Support/Adobe/Common/Media Cache Files"/* >> "$LOGFILE" 2>&1
+    rm -rf "$HOME/Library/Application Support/Adobe/Common/Media Cache"/* >> "$LOGFILE" 2>&1
+    rm -rf "$HOME/Library/Application Support/Adobe/Adobe PCD"/* >> "$LOGFILE" 2>&1
+    rm -rf "$HOME/Library/Application Support/Adobe/CoreSync"/* >> "$LOGFILE" 2>&1
+    security delete-generic-password -l "Adobe" all 2>/dev/null
+    echo "    Done."
+else
+    echo "    Adobe applications not installed, skipping."
 fi
 
 echo

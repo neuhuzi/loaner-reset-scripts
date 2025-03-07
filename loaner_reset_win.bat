@@ -10,6 +10,8 @@ echo  1. Clear Downloads, Documents, and Desktop folders
 echo  2. Clear browser data (Chrome, Firefox, Edge)
 echo  3. Sign out of Microsoft 365 applications
 echo  4. Remove saved credentials
+echo  5. Remove Chrome profiles
+echo  6. Sign out of Adobe applications
 echo.
 echo Press CTRL+C to cancel or any key to continue...
 pause > nul
@@ -41,11 +43,8 @@ echo [*] Clearing browser data...
 echo   - Clearing Google Chrome data...
 taskkill /F /IM chrome.exe >> %LOGFILE% 2>&1
 if exist "%LOCALAPPDATA%\Google\Chrome\User Data" (
-    rmdir /s /q "%LOCALAPPDATA%\Google\Chrome\User Data\Default\Cache" >> %LOGFILE% 2>&1
-    rmdir /s /q "%LOCALAPPDATA%\Google\Chrome\User Data\Default\Cookies" >> %LOGFILE% 2>&1
-    rmdir /s /q "%LOCALAPPDATA%\Google\Chrome\User Data\Default\History" >> %LOGFILE% 2>&1
-    rmdir /s /q "%LOCALAPPDATA%\Google\Chrome\User Data\Default\Login Data" >> %LOGFILE% 2>&1
-    rmdir /s /q "%LOCALAPPDATA%\Google\Chrome\User Data\Default\Web Data" >> %LOGFILE% 2>&1
+    echo     Removing Chrome profiles and data...
+    rmdir /s /q "%LOCALAPPDATA%\Google\Chrome\User Data" >> %LOGFILE% 2>&1
     echo     Done.
 ) else (
     echo     Chrome not installed, skipping.
@@ -128,6 +127,28 @@ if exist "%APPDATA%\Microsoft\Teams" (
     echo     Done.
 ) else (
     echo     Teams not installed, skipping.
+)
+
+echo.
+echo [*] Signing out of Adobe applications...
+:: Kill Adobe applications
+taskkill /F /IM "Adobe Creative Cloud.exe" >> %LOGFILE% 2>&1
+taskkill /F /IM "Photoshop.exe" >> %LOGFILE% 2>&1
+taskkill /F /IM "Illustrator.exe" >> %LOGFILE% 2>&1
+taskkill /F /IM "InDesign.exe" >> %LOGFILE% 2>&1
+taskkill /F /IM "Acrobat.exe" >> %LOGFILE% 2>&1
+
+:: Clear Adobe application data
+echo   - Removing Adobe credentials and cache...
+if exist "%APPDATA%\Adobe" (
+    rmdir /s /q "%APPDATA%\Adobe\Common\Media Cache Files" >> %LOGFILE% 2>&1
+    rmdir /s /q "%APPDATA%\Adobe\Common\Media Cache" >> %LOGFILE% 2>&1
+    rmdir /s /q "%APPDATA%\Adobe\Adobe PCD" >> %LOGFILE% 2>&1
+    rmdir /s /q "%APPDATA%\Adobe\CoreSync" >> %LOGFILE% 2>&1
+    reg delete "HKCU\Software\Adobe" /f >> %LOGFILE% 2>&1
+    echo     Done.
+) else (
+    echo     Adobe applications not installed, skipping.
 )
 
 echo.
